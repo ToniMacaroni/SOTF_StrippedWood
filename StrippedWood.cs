@@ -16,6 +16,7 @@ public class StrippedWood : SonsMod, IOnGameActivatedReceiver
         public float NormalScale = 0.3f;
         public float Occlusion = 1.0f;
 
+        // convert normal (no pun intended) textures to hdrp normal textures where r is in the alpha channel
         public Texture2D LoadAndConvertNormalTex(string path)
         {
             var nTex = new Texture2D(2, 2, TextureFormat.RGBA32, false, true);
@@ -50,10 +51,10 @@ public class StrippedWood : SonsMod, IOnGameActivatedReceiver
 
     private readonly Dictionary<int, MaterialDef> _mappings = new();
     
-    private static readonly int BaseColorMap = Shader.PropertyToID("_BaseColorMap");
-    private static readonly int NormalMap = Shader.PropertyToID("_NormalMap");
-    private static readonly int NormalScale = Shader.PropertyToID("_NormalScale");
-    private static readonly int Occlusion = Shader.PropertyToID("_Occlusion");
+    private static readonly int PropBaseColorMap = Shader.PropertyToID("_BaseColorMap");
+    private static readonly int PropNormalMap = Shader.PropertyToID("_NormalMap");
+    private static readonly int PropNormalScale = Shader.PropertyToID("_NormalScale");
+    private static readonly int PropOcclusion = Shader.PropertyToID("_Occlusion");
 
     protected override void OnInitializeMod()
     {
@@ -64,6 +65,7 @@ public class StrippedWood : SonsMod, IOnGameActivatedReceiver
     {
         SettingsRegistry.CreateSettings(this, null, typeof(Config));
 
+        // Your mod class has access to the "DataPath" property which is the <gamedir>/Mods/<yourmod>/ directory
         var dataPath = DataPath;
 
         var beamLogDef = new MaterialDef();
@@ -90,14 +92,17 @@ public class StrippedWood : SonsMod, IOnGameActivatedReceiver
 
     public void OnGameActivated()
     {
+        // OnGameActived is usually late enough so the scene has loaded and most systems are instantiated
+        // but early enough that you can modify prefabs before they get instantiated
+        
         foreach (var (id, def) in _mappings)
         {
             foreach (var comp in ConstructionTools.GetProfile(id)._prefab.GetComponentsInChildren<MeshRenderer>())
             {
-                comp.sharedMaterial.SetTexture(BaseColorMap, def.Diffuse);
-                comp.sharedMaterial.SetTexture(NormalMap, def.Normal);
-                comp.sharedMaterial.SetFloat(NormalScale, def.NormalScale);
-                comp.sharedMaterial.SetFloat(Occlusion, def.Occlusion);
+                comp.sharedMaterial.SetTexture(PropBaseColorMap, def.Diffuse);
+                comp.sharedMaterial.SetTexture(PropNormalMap, def.Normal);
+                comp.sharedMaterial.SetFloat(PropNormalScale, def.NormalScale);
+                comp.sharedMaterial.SetFloat(PropOcclusion, def.Occlusion);
             }
         }
     }
