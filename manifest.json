@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ToniMacaroni/RedLoader/main/MetadataSchema.json",
+  "id": "StrippedWood",
+  "author": "Toni Macaroni",
+  "version": "1.0.0",
+  "description": "Alternative stripped wood look for logs.",
+  "gameVersion": "1.0.0",
+  "type": "Mod",
+  "url": "..."
+}
